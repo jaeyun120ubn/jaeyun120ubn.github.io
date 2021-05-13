@@ -18,9 +18,14 @@
 	</body>
 	<script>
 
+		var post_list = new Vue({
+			el: "#post_list",
+			data: {
+				fileInfos: null
+			}
+		})
 
 		function fetchData() {
-
 			// 반환값을 받을 Promise 객체 생성
 			return new Promise(function (receive) {
 				fetch("./post/post.json") // json 파일 읽어오기
@@ -29,29 +34,21 @@
 				})
 				.then(function (data) { 
 					console.log(data)
-					return data;
+					post_list.fileInfos = data;
 					//receive(JSON.stringify(data)); // json파일을 텍스트로
 				});
 			});
 		}
 
-		// var postList = (async function () { 
-		// 	// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
-		// 	// 반환되는 값을 받는다.
-		// 	return await fetchData(); 
-
-		// 	//$(".getJson").text(jsonData);
-		// })();
-
-		var aa = new Array();
-		async function aaa()
-		{
-			console.log("aaa2")
-			result = await fetchData()
-			alert(result);
-		}
 		
-		aaa();
+		(async function () { 
+			// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
+			// 반환되는 값을 받는다.
+			await fetchData(); 
+
+			//$(".getJson").text(jsonData);
+		})();
+
 
 		var h1 = new Vue({
 			el: "#e1",
@@ -60,11 +57,6 @@
 				id: "Hello World!"
 			}
 		});
-		var post_list = new Vue({
-			el: "#post_list",
-			data: {
-				fileInfos: aa
-			}
-		})
+
 	</script>
 </html>
