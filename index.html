@@ -13,8 +13,6 @@
 				{{ fileInfo.path }}
 			</li>
 		</ul>
-
-
 		</div>
 	</body>
 	<script>
@@ -50,6 +48,7 @@
 			// 반환되는 값을 받는다.
 			jsonData = await fetchData(); 
 			console.log(jsonData)
+			return jsonData
 			//$(".getJson").text(jsonData);
 		})()
 			}
