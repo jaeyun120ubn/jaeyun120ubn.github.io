@@ -43,15 +43,16 @@
 		// 	//$(".getJson").text(jsonData);
 		// })();
 
+		var aa;
 		async function aaa()
 		{
-			var aa = await fetchData()
+			aa = await fetchData()
 			console.log("aa = ")
 			console.log(aa)
 		}
 		
 		aaa();
-		
+
 		var h1 = new Vue({
 			el: "#e1",
 			data: {
@@ -62,7 +63,7 @@
 		var post_list = new Vue({
 			el: "#post_list",
 			data: {
-				fileInfos: await fetchData()
+				fileInfos: 
 			}
 		})
 	</script>
