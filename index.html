@@ -19,6 +19,7 @@
 	</body>
 	<script>
 
+
 		function fetchData() {
 
 			// 반환값을 받을 Promise 객체 생성
@@ -28,7 +29,8 @@
 					return response.json(); // 읽어온 데이터를 json으로 변환
 				})
 				.then(function (data) { 
-					return [{'aaa': 'bbb'}, {'ccc': 'ddd'}]//data;
+					console.log(jsonData)
+					return data;
 					//receive(JSON.stringify(data)); // json파일을 텍스트로
 				});
 			});
