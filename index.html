@@ -1,37 +1,59 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script type="text/javascript" src="resource/js/vue.js"></script>
+		<script type="text/javascript" src="post/post.json"></script>
 	</head>
 	<body>
-		<h1 v-bind:title="bmsg">{{ message }}</h1>
+		<h1 id='e1'>{{ message }}</h1>
         
         <div>
-        helloworld
 		<ul id="post_list">
-			<li v-for="fileName in fileNames">
-				{{ fileName }}
+			<li v-for="fileInfo in fileInfos">
+				{{ fileInfo.path }}
 			</li>
-			</ul>
+		</ul>
+
+		<input id="fileItem" type="file">
+
 		</div>
 	</body>
 	<script>
-		function readFile(file)
-		{
-			return new FileReader().readAsText(file, 'UTF-8');
+
+		function fetchData() {
+
+			// 반환값을 받을 Promise 객체 생성
+			return new Promise(function (receive) {
+				fetch("./post/post.json") // json 파일 읽어오기
+				.then(function (response) {
+					return response.json(); // 읽어온 데이터를 json으로 변환
+				})
+				.then(function (data) { 
+					receive(JSON.stringify(data)); // json파일을 텍스트로
+				});
+			});
 		}
 
+		(async function () { 
+			// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
+			// 반환되는 값을 받는다.
+			jsonData = await fetchData(); 
+			console.log(jsonData)
+			//$(".getJson").text(jsonData);
+		})();
+		
 		var h1 = new Vue({
-			el: "h1",
+			el: "#e1",
 			data: {
 				message: "Jaeyun`s Github Blog!",
-				bmsg: "Hello World!"
+				id: "Hello World!"
 			}
 		});
 		var post_list = new Vue({
-			el: "post_list",
+			el: "#post_list",
 			data: {
-				fileNames: ["hello", "hi"]
+				fileInfos: JSON.parse(post)
 			}
 		})
 	</script>
