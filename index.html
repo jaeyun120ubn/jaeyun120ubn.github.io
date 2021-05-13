@@ -38,11 +38,8 @@
 		var postList = (async function () { 
 			// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
 			// 반환되는 값을 받는다.
-			console.log("aaaaaa")
-			jsonData = await fetchData(); 
-			console.log("test")
-			console.log(jsonData)
-			return jsonData
+			return await fetchData(); 
+
 			//$(".getJson").text(jsonData);
 		})();
 		
