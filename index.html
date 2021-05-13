@@ -34,13 +34,7 @@
 			});
 		}
 
-		(async function () { 
-			// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
-			// 반환되는 값을 받는다.
-			jsonData = await fetchData(); 
-			console.log(jsonData)
-			//$(".getJson").text(jsonData);
-		})();
+
 		
 		var h1 = new Vue({
 			el: "#e1",
@@ -52,7 +46,13 @@
 		var post_list = new Vue({
 			el: "#post_list",
 			data: {
-				fileInfos: JSON.parse(post)
+				fileInfos: 		(async function () { 
+			// fetchData() 함수를 호출해 fetch() 후 두번의 .then()을 거치는 동안을 기다려 
+			// 반환되는 값을 받는다.
+			jsonData = await fetchData(); 
+			console.log(jsonData)
+			//$(".getJson").text(jsonData);
+		})()
 			}
 		})
 	</script>
