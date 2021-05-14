@@ -11,17 +11,19 @@
 	<body>
         <h1>Jaeyun`s blog</h1>
         <div class="content container">
-			<div v-for="fileInfo in fileInfos" class='row'>
-				<div class='col'>
-					<div class='card' style='width: 30rem;'>
-						<div class='card-body'>
-							<div class="row border border-gray mb-3">                      
-								<div class='col-md-12 pb-2 pt-2' name='title'><p class='fs-1 fw-bold'>{{ fileInfo.name }}</p></div>
-								<div class='col-md-12 pb-2 pt-2' name='title'><a v-bind:href="fileInfo.path"><img v-bind:src="fileInfo.cart_img"></a></div>
-								
-								<div class='col-md-12 pb-2 pt-2' name='contents'><p class='fs-3 text-break' v-for="desc_line in fileInfo.desc">{{ desc_line }}</p></div>
+			<div v-for="fileInfo in fileInfos">
+				<div class='row'>
+					<div class='col'>
+						<div class='card' style='width: 30rem;'>
+							<div class='card-body'>
+								<div class="row border border-gray mb-3">                      
+									<div class='col-md-12 pb-2 pt-2' name='title'><p class='fs-1 fw-bold'>{{ fileInfo.name }}</p></div>
+									<div class='col-md-12 pb-2 pt-2' name='title'><a v-bind:href="fileInfo.path"><img v-bind:src="fileInfo.cart_img"></a></div>
+									
+									<div class='col-md-12 pb-2 pt-2' name='contents'><p class='fs-3 text-break' v-for="desc_line in fileInfo.desc">{{ desc_line }}</p></div>
 
-								<div class='col-md-2 pb-2 pt-2' name='nickname'><p class='fs-4 fw-light text-end text-black-50'>author {{ fileInfo.author }}</p></div>                
+									<div class='col-md-2 pb-2 pt-2' name='nickname'><p class='fs-4 fw-light text-end text-black-50'>author {{ fileInfo.author }}</p></div>                
+								</div>
 							</div>
 						</div>
 					</div>
