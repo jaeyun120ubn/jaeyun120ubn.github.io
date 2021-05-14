@@ -1,13 +1,13 @@
 [
     {
-        "path": "canon/canon2.html",
-        "cart_img": "canon/canon2.p8.png",
+        "path": "post/canon/canon2.html",
+        "cart_img": "post/canon/canon2.p8.png",
         "name": "canon2",
         "date": "2019-04-15"
     },
     {
-        "path": "circles/circles.html",
-        "cart_img": "circles/circles.p8.png",
+        "path": "post/circles/circles.html",
+        "cart_img": "post/circles/circles.p8.png",
         "name": "circles",
         "date": "2019-11-20"
     }
