@@ -1,14 +1,29 @@
 [
-    {
-        "path": "post/canon/canon2.html",
-        "cart_img": "post/canon/canon2.p8.png",
-        "name": "canon2",
-        "date": "2019-04-15"
-    },
+
     {
         "path": "post/circles/circles.html",
         "cart_img": "post/circles/circles.p8.png",
         "name": "circles",
-        "date": "2019-11-20"
+        "date": "2019-11-20",
+        "author": "효과음: 김재윤, 코드: 엄마",
+        "desc": [
+            "초등학교 2학년때.", 
+            "아이가 만들고 싶다는 게임의 규칙을 듣고 만들어주고 코드에서 숫자(오브젝트 개수와 시간 등)를 바꾸면서 조절하면서 가지고 놀게 함.",
+            "게임에 완성되어감에 따라 아이는 거기에 맞는 효과음을 만듬",
+            "itch.io에 런칭하는 과정까지 함께 진행함",
+            "https://mindulle.itch.io/circles"
+        ]
+
+    },
+    {
+        "path": "post/canon/canon2.html",
+        "cart_img": "post/canon/canon2.p8.png",
+        "name": "canon2",
+        "date": "2018-04-15",
+        "author": "음악/그림: 김재윤, 코드: 엄마",
+        "desc": [
+            "초등학교 1학년때",
+            "학교에서 캐논 변주곡 악보를 받아 오카리나 연주를 하고 캐논 변주곡을 좋아하게 되어 미디로 찍은 곡에 픽셆로 찍은 그림들을 더함."
+        ]
     }
 ]
