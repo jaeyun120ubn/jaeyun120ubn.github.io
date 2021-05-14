@@ -853,7 +853,13 @@
 	</div> <!-- body_0 -->
 	</body>
 	<script>
-
+	var blog = new Vue({
+		el: "#blog",
+		data: {
+			title: "Jaeyun`s Blog!"
+		}
+	});
+	
 	var post_list = new Vue({
 		el: "#post_list",
 		data: {
@@ -887,13 +893,7 @@
 	})();
 
 
-	var h1 = new Vue({
-		el: "#e1",
-		data: {
-			message: "Jaeyun`s Github Blog!",
-			id: "Hello World!"
-		}
-	});
+
 
 	</script>
 </html>
