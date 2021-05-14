@@ -11,8 +11,8 @@
 	<body>
         <h1>Jaeyun`s blog</h1>
         <div class="content container">
-			<div v-for="fileInfo in fileInfos">
-				<div class='row'>
+			<div >
+				<div v-for="fileInfo in fileInfos" v-bind:key='fileInfo' class='row'>
 					<div class='col'>
 						<div class='card' style='width: 30rem;'>
 							<div class='card-body'>
