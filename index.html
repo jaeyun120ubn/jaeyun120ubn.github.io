@@ -742,6 +742,7 @@
 	
 	
 	<!-- Add any content above the cart here -->
+	<h1 id="blog">{{ blog.title }}</h1>
 	
 	
 	<div id="p8_desktop" style="display:block; position:absolute; top:10px; left:10px"></div> <!-- desktop for saving gifs / screenshots -->
@@ -841,7 +842,6 @@
 	
 	<script type="text/javascript" src="resource/js/vue.js"></script>
 
-	<h1 id='e1'>{{ message }}</h1>
         
         <div>
 			<ul id="post_list">
@@ -910,7 +910,6 @@
 		<script type="text/javascript" src="resource/js/vue.js"></script>
 	</head>
 	<body>
-		<h1 id='e1'>{{ message }}</h1>
         
         <div>
 			<ul id="post_list">
@@ -921,6 +920,12 @@
 		</div>
 	</body>
 	<script>
+		var blog = new Vue({
+			el: "#blog",
+			data: {
+				title: "Jaeyun`s Blog!",
+			}
+		});
 
 		var post_list = new Vue({
 			el: "#post_list",
@@ -953,15 +958,6 @@
 
 			//$(".getJson").text(jsonData);
 		})();
-
-
-		var h1 = new Vue({
-			el: "#e1",
-			data: {
-				message: "Jaeyun`s Github Blog!",
-				id: "Hello World!"
-			}
-		});
 
 	</script>
 </html>
