@@ -329,7 +329,7 @@ function move()
             jt = 30
         end
     end
-    if btnp(4,1) then
+    if btnp(5) then
         jt = 100
         msg = "cheat? you use cheeeeeeat?? did you really have to use cheats?"
         msg_time = 288
@@ -594,7 +594,7 @@ function _update60()
             if y > 300 then
                 y = 200
             end
-            if btnp(5,1) then
+            --[[if btnp(5,1) then
                 diff = -1
             end
             if btnp(0,1) then
@@ -602,7 +602,15 @@ function _update60()
             end
             if btnp(3,1) then
                 diff = 1
+            end--]]
+            if btnp(2) then
+                diff += 1
             end
+            if btnp(3) then
+                diff -= 1
+            end
+            diff = min(diff,1)
+            diff = max(diff,-1)
             x = min(x,428)
             x = max(x,-300)
             if y <= -10000 then
@@ -684,10 +692,9 @@ function _draw()
     print("stage3 : water",32,-4010,flr(rnd(2)+1))
     print("stage4 : ice",64,-6010,flr(rnd(2))+11)
     print("stage5 : electricity",32,-8010,flr(rnd(3))+10)
-    print("easy : a button",64,100,11)
-    print("medium : s button",64,106,10)
-    print("hard : d button",64,112,8)
-    print("cheat : tab button",64,120,8)
+    print("easyer : down button",64,100,11)
+    print("harder : up button",64,106,8)
+    print("cheat : x button",64,112,8)
     print("khs♥pji",64,-10006,rnd(16))
     print("the end",0,-10006,rnd(16))
     if x > 328 then
