@@ -51,6 +51,7 @@
   </div>
 
 <script>
+let users = []; // ← 서버에서 받아올 전체 점수 목록 
 let gpio = Array(16).fill(0);
 let username = localStorage.getItem("username");
 let currentTab = "best";
@@ -94,6 +95,7 @@ window.addEventListener("message", (event) => {
   if (event.data?.type === "pico8-gpio") {
     gpio = event.data.data.slice(0, 16);
     renderRanking();
+    sendScoreToServer();
   }
 });
 
@@ -121,7 +123,7 @@ function renderRanking() {
   const container = document.getElementById("ranking-display");
   container.innerHTML = "";
 
-  const users = JSON.parse(localStorage.getItem("scores") || "[]");
+//  const users = JSON.parse(localStorage.getItem("scores") || "[]"); 
 
   // 본인 점수 추가/업데이트
   if (username) {
@@ -179,6 +181,43 @@ const score = (
     container.appendChild(div);
   });
 }
+
+function loadScoresFromServer() {
+  fetch("https://your-server.com/scores") // ✅ 여기에 실제 서버 주소 입력
+    .then(res => res.json())
+    .then(data => {
+      users = data; // 서버에서 받은 사용자 배열 저장
+      renderRanking(); // 점수 표시 다시 하기
+    })
+    .catch(err => {
+      console.error("서버에서 점수 불러오기 실패:", err);
+    });
+}
+
+
+
+function sendScoreToServer() {
+  if (!username) return;
+
+  fetch("https://your-server.com/submit-score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: username, gpio })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("서버로 점수 전송 완료:", data);
+  })
+  .catch(err => {
+    console.error("점수 전송 실패:", err);
+  });
+}
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadScoresFromServer(); // 페이지 열릴 때 서버에서 점수 받아오기
+});
+
 </script>
 </body>
 </html>
