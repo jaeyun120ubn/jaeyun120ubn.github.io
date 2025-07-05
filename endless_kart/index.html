@@ -53,6 +53,12 @@
 <script>
 let users = []; // ← 서버에서 받아올 전체 점수 목록 
 let gpio = Array(16).fill(0);
+
+const saved = JSON.parse(localStorage.getItem("scores")|| "[]");
+if (saved.length > 0) {
+  users = saved;
+}
+
 let username = localStorage.getItem("username");
 let currentTab = "best";
 let currentSubIndex = 6;
