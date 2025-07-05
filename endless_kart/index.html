@@ -161,10 +161,14 @@ function renderRanking() {
   }
   else if (currentTab === "combined") {
     ranked = users.slice().sort((a, b) => {
-      const calc = (g) => weights.reduce((sum, w, i) => sum + g[i] * w, 0);
+      const calc = (g) =>
+        Array.isArray(g)
+          ? weights.reduce((sum, w, i) => sum + (g[i] || 0) * w, 0)
+          : 0;
       return calc(b.gpio) - calc(a.gpio);
     });
   }
+
   else if (currentTab === "today") {
     const today = new Date().toISOString().slice(0, 10);
     ranked = users
