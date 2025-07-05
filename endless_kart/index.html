@@ -51,6 +51,7 @@
   </div>
 
 <script>
+const weights = [0.5, 0.25, 0.125, 0.075, 0.05];
 let users = []; // ← 서버에서 받아올 전체 점수 목록 
 let gpio = Array(16).fill(0);
 
@@ -133,7 +134,7 @@ for (let i = 6; i < 16; i++) {
 }
 
 
-const weights = [0.5, 0.25, 0.125, 0.075, 0.05];
+
 
 function renderRanking() {
   const container = document.getElementById("ranking-display");
