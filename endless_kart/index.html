@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>ENDLESS KART 순위표</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #111; color: #fff; }
+    iframe { width: 100%; height: 480px; border: none; display: block; }
+    .tabs, .sub-tabs { display: flex; gap: 10px; padding: 10px; background: #222; }
+    .tabs button, .sub-tabs button { flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; }
+    .tabs button.active, .sub-tabs button.active { background: #555; }
+    .ranking { padding: 10px; }
+    .ranking-entry { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 5px 0; }
+    #username-setup, #change-name { margin: 10px; }
+    input[type="text"] { padding: 5px; }
+    button { border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- 게임 iframe -->
+  <iframe id="game-frame" src="game/junimo_kart26.html"></iframe>
+
+  <!-- 이름 입력 (최초 또는 수정) -->
+  <div id="username-setup" style="display:none;">
+    <label>당신의 이름을 입력하세요:
+      <input type="text" id="username-input">
+    </label>
+    <button onclick="saveUsername()">저장</button>
+  </div>
+
+  <!-- 탭 선택 -->
+  <div class="tabs">
+    <button onclick="showTab('best')" class="active">최고기록</button>
+    <button onclick="showTab('combined')">1~5등 종합 기록</button>
+    <button onclick="showTab('today')">오늘의 맵 최고기록</button>
+    <button onclick="showTab('counts')">특정 점수 넘긴 횟수</button>
+  </div>
+
+  <!-- 세부 탭 (특정 점수 횟수용) -->
+  <div class="sub-tabs" id="count-subtabs" style="display:none;">
+    <!-- 버튼 10개 생성됨 -->
+  </div>
+
+  <!-- 순위 표시 영역 -->
+  <div class="ranking" id="ranking-display"></div>
+
+  <!-- 이름 변경 -->
+  <div id="change-name">
+    <button onclick="resetUsername()">이름 변경하기</button>
+  </div>
+
+<script>
+let gpio = Array(16).fill(0);
+let username = localStorage.getItem("username");
+let currentTab = "best";
+let currentSubIndex = 6;
+
+// 최초 이름 설정
+if (!username) {
+  document.getElementById("username-setup").style.display = "block";
+} else {
+  document.getElementById("username-setup").style.display = "none";
+}
+
+// 이름 저장
+function saveUsername() {
+  const input = document.getElementById("username-input").value.trim();
+  if (input) {
+    localStorage.setItem("username", input);
+    username = input;
+    document.getElementById("username-setup").style.display = "none";
+  }
+}
+
+// 이름 초기화
+function resetUsername() {
+  localStorage.removeItem("username");
+  location.reload();
+}
+
+// 탭 표시
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.tabs button[onclick="showTab('${tab}')"]`).classList.add('active');
+
+  document.getElementById("count-subtabs").style.display = (tab === "counts") ? "flex" : "none";
+  renderRanking();
+}
+
+// 점수 받기 (iframe에서)
+window.addEventListener("message", (event) => {
+  if (event.data?.type === "pico8-gpio") {
+    gpio = event.data.data.slice(0, 16);
+    renderRanking();
+  }
+});
+
+// 목표 점수 목록
+const targetScores = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000];
+
+// 10개 서브탭 생성
+for (let i = 6; i < 16; i++) {
+  const btn = document.createElement("button");
+  const labelIndex = i - 6;
+  btn.textContent = `${targetScores[labelIndex]}점`; // 목표 점수 표시
+  btn.onclick = () => {
+    currentSubIndex = i;
+    document.querySelectorAll(".sub-tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderRanking();
+  };
+  if (i === 6) btn.classList.add("active");
+  document.getElementById("count-subtabs").appendChild(btn);
+}
+
+
+// 순위 계산 및 표시
+function renderRanking() {
+  const container = document.getElementById("ranking-display");
+  container.innerHTML = "";
+
+  const users = JSON.parse(localStorage.getItem("scores") || "[]");
+
+  // 본인 점수 추가/업데이트
+  if (username) {
+    let existing = users.find(u => u.name === username);
+    if (!existing) {
+      existing = { name: username, gpio: [...gpio] };
+      users.push(existing);
+    } else {
+      existing.gpio = [...gpio];
+    }
+    localStorage.setItem("scores", JSON.stringify(users));
+  }
+
+  let ranked = [];
+
+  if (currentTab === "best") {
+    ranked = users.slice().sort((a, b) => b.gpio[0] - a.gpio[0]);
+  }
+  else if (currentTab === "combined") {
+    const weights = [0.5, 0.25, 0.125, 0.075, 0.05];
+    ranked = users.slice().sort((a, b) => {
+      const calc = (g) => weights.reduce((sum, w, i) => sum + g[i] * w, 0);
+      return calc(b.gpio) - calc(a.gpio);
+    });
+  }
+  else if (currentTab === "today") {
+    const today = new Date().toISOString().slice(0, 10);
+    ranked = users
+      .map(u => ({ ...u, score: u.gpio[5], date: u.date || today }))
+      .filter(u => u.date === today)
+      .sort((a, b) => b.score - a.score);
+  }
+  else if (currentTab === "counts") {
+    ranked = users.slice().sort((a, b) => b.gpio[currentSubIndex] - a.gpio[currentSubIndex]);
+  }
+
+  ranked.forEach((u, idx) => {
+    let rawScore = (
+  currentTab === "counts"
+    ? u.gpio[currentSubIndex]
+    : currentTab === "combined"
+    ? weights.reduce((sum, w, i) => sum + u.gpio[i] * w, 0)
+    : currentTab === "today"
+    ? u.gpio[5]
+    : u.gpio[0]
+);
+
+const score = (
+  currentTab === "counts" ? rawScore : rawScore * 100
+).toFixed(0);
+
+    const div = document.createElement("div");
+    div.className = "ranking-entry";
+    div.innerHTML = `<strong>${idx + 1}. ${u.name}</strong> <span>${score}</span>`;
+    container.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
