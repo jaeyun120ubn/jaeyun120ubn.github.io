@@ -50,198 +50,182 @@
     <button onclick="resetUsername()">이름 변경하기</button>
   </div>
 
-<script>
-let username = localStorage.getItem("username");
-const weights = [0.5, 0.25, 0.125, 0.075, 0.05];
-let users = []; // ← 서버에서 받아올 전체 점수 목록 
-let gpio = Array(16).fill(0);
-
-
-
-const saved = JSON.parse(localStorage.getItem("scores")|| "[]");
-if (saved.length > 0) {
-  users = saved;
-
-  if (username) {
-    const my = users.find(u => u.name === username);
-    if (my) {
-      gpio = [...my.gpio];
+  <script>
+    let username = localStorage.getItem("username");  // 선언 최상단
+    const weights = [0.5, 0.25, 0.125, 0.075, 0.05];
+    let users = [];
+    let gpio = Array(16).fill(0);
+    let currentTab = "best";
+    let currentSubIndex = 6;
+    
+    function saveUsername() {
+      const input = document.getElementById("username-input").value.trim();
+      if (input) {
+        localStorage.setItem("username", input);
+        username = input;
+        document.getElementById("username-setup").style.display = "none";
+      }
     }
-  }
-
-  renderRanking();
-}
-
-
-let currentTab = "best";
-let currentSubIndex = 6;
-
-// 최초 이름 설정
-if (!username) {
-  document.getElementById("username-setup").style.display = "block";
-} else {
-  document.getElementById("username-setup").style.display = "none";
-}
-
-// 이름 저장
-function saveUsername() {
-  const input = document.getElementById("username-input").value.trim();
-  if (input) {
-    localStorage.setItem("username", input);
-    username = input;
-    document.getElementById("username-setup").style.display = "none";
-  }
-}
-
-// 이름 초기화
-function resetUsername() {
-  localStorage.removeItem("username");
-  location.reload();
-}
-
-// 탭 표시
-function showTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`.tabs button[onclick="showTab('${tab}')"]`).classList.add('active');
-
-  document.getElementById("count-subtabs").style.display = (tab === "counts") ? "flex" : "none";
-  renderRanking();
-}
-
-// 점수 받기 (iframe에서)
-window.addEventListener("message", (event) => {
-  if (event.data?.type === "pico8-gpio") {
-    gpio = event.data.data.slice(0, 16);
-    renderRanking();
-    sendScoreToServer();
-  }
-});
-
-// 목표 점수 목록
-const targetScores = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000];
-
-// 10개 서브탭 생성
-for (let i = 6; i < 16; i++) {
-  const btn = document.createElement("button");
-  const labelIndex = i - 6;
-  btn.textContent = `${targetScores[labelIndex]}점`; // 목표 점수 표시
-  btn.onclick = () => {
-    currentSubIndex = i;
-    document.querySelectorAll(".sub-tabs button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    renderRanking();
-  };
-  if (i === 6) btn.classList.add("active");
-  document.getElementById("count-subtabs").appendChild(btn);
-}
-
-
-
-
-function renderRanking() {
-  const container = document.getElementById("ranking-display");
-  container.innerHTML = "";
-
-  if (username) {
-    let existing = users.find(u => u.name === username);
-    if (!existing) {
-      existing = { name: username, gpio: [...gpio] };
-      users.push(existing);
-    } else {
-      existing.gpio = [...gpio];
+    
+    function resetUsername() {
+      localStorage.removeItem("username");
+      location.reload();
     }
-    localStorage.setItem("scores", JSON.stringify(users));
-  }
-
-  let ranked = [];
-
-  if (currentTab === "best") {
-    ranked = users.slice().sort((a, b) => b.gpio[0] - a.gpio[0]);
-  }
-  else if (currentTab === "combined") {
-    ranked = users.slice().sort((a, b) => {
-      const calc = (g) =>
-        Array.isArray(g)
-          ? weights.reduce((sum, w, i) => sum + (g[i] || 0) * w, 0)
-          : 0;
-      return calc(b.gpio) - calc(a.gpio);
+    
+    function showTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      const btn = document.querySelector(`.tabs button[onclick="showTab('${tab}')"]`);
+      if (btn) btn.classList.add('active');
+    
+      document.getElementById("count-subtabs").style.display = (tab === "counts") ? "flex" : "none";
+      renderRanking();
+    }
+    
+    function renderRanking() {
+      const container = document.getElementById("ranking-display");
+      container.innerHTML = "";
+    
+      if (username) {
+        let existing = users.find(u => u.name === username);
+        if (!existing) {
+          existing = { name: username, gpio: [...gpio] };
+          users.push(existing);
+        } else {
+          existing.gpio = [...gpio];
+        }
+        localStorage.setItem("scores", JSON.stringify(users));
+      }
+    
+      let ranked = [];
+    
+      if (currentTab === "best") {
+        ranked = users.slice().sort((a, b) => b.gpio[0] - a.gpio[0]);
+      }
+      else if (currentTab === "combined") {
+        ranked = users.slice().sort((a, b) => {
+          const calc = (g) =>
+            Array.isArray(g)
+              ? weights.reduce((sum, w, i) => sum + (g[i] || 0) * w, 0)
+              : 0;
+          return calc(b.gpio) - calc(a.gpio);
+        });
+      }
+      else if (currentTab === "today") {
+        const today = new Date().toISOString().slice(0, 10);
+        ranked = users
+          .map(u => ({ ...u, score: u.gpio[5], date: u.date || today }))
+          .filter(u => u.date === today)
+          .sort((a, b) => b.score - a.score);
+      }
+      else if (currentTab === "counts") {
+        ranked = users.slice().sort((a, b) => b.gpio[currentSubIndex] - a.gpio[currentSubIndex]);
+      }
+    
+      ranked.forEach((u, idx) => {
+        const g = Array.isArray(u.gpio) ? u.gpio : Array(16).fill(0);
+    
+        let rawScore = (
+          currentTab === "counts"
+            ? g[currentSubIndex]
+            : currentTab === "combined"
+            ? weights.reduce((sum, w, i) => sum + (g[i] || 0) * w, 0)
+            : currentTab === "today"
+            ? g[5]
+            : g[0]
+        );
+    
+        if (typeof rawScore !== "number" || isNaN(rawScore)) rawScore = 0;
+    
+        const score = (
+          currentTab === "counts" ? rawScore : rawScore * 100
+        ).toFixed(0);
+    
+        const div = document.createElement("div");
+        div.className = "ranking-entry";
+        div.innerHTML = `<strong>${idx + 1}. ${u.name}</strong> <span>${score}</span>`;
+        container.appendChild(div);
+      });
+    }
+    
+    function sendScoreToServer() {
+      if (!username) return;
+    
+      fetch("https://your-server.com/submit-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: username, gpio })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("서버로 점수 전송 완료:", data);
+      })
+      .catch(err => {
+        console.error("점수 전송 실패:", err);
+      });
+    }
+    
+    function loadScoresFromServer() {
+      fetch("https://your-server.com/scores")
+        .then(res => res.json())
+        .then(data => {
+          users = data;
+          renderRanking();
+        })
+        .catch(err => {
+          console.error("서버에서 점수 불러오기 실패:", err);
+        });
+    }
+    
+    // iframe에서 점수 수신
+    window.addEventListener("message", (event) => {
+      if (event.data?.type === "pico8-gpio") {
+        gpio = event.data.data.slice(0, 16);
+        renderRanking();
+        sendScoreToServer();
+      }
     });
-  }
-
-  else if (currentTab === "today") {
-    const today = new Date().toISOString().slice(0, 10);
-    ranked = users
-      .map(u => ({ ...u, score: u.gpio[5], date: u.date || today }))
-      .filter(u => u.date === today)
-      .sort((a, b) => b.score - a.score);
-  }
-  else if (currentTab === "counts") {
-    ranked = users.slice().sort((a, b) => b.gpio[currentSubIndex] - a.gpio[currentSubIndex]);
-  }
-
-  ranked.forEach((u, idx) => {
-    const g = Array.isArray(u.gpio) ? u.gpio : Array(16).fill(0);
-
-    let rawScore = (
-      currentTab === "counts"
-        ? g[currentSubIndex]
-        : currentTab === "combined"
-        ? weights.reduce((sum, w, i) => sum + g[i] * w, 0)
-        : currentTab === "today"
-        ? g[5]
-        : g[0]
-    );
-
-    if (typeof rawScore !== "number" || isNaN(rawScore)) rawScore = 0;
-
-    const score = (
-      currentTab === "counts" ? rawScore : rawScore * 100
-    ).toFixed(0);
-
-    const div = document.createElement("div");
-    div.className = "ranking-entry";
-    div.innerHTML = `<strong>${idx + 1}. ${u.name}</strong> <span>${score}</span>`;
-    container.appendChild(div);
-  });
-}
-
-function loadScoresFromServer() {
-  fetch("https://your-server.com/scores") // ✅ 여기에 실제 서버 주소 입력
-    .then(res => res.json())
-    .then(data => {
-      users = data; // 서버에서 받은 사용자 배열 저장
-      renderRanking(); // 점수 표시 다시 하기
-    })
-    .catch(err => {
-      console.error("서버에서 점수 불러오기 실패:", err);
+    
+    // 페이지 준비 완료 시 초기화
+    window.addEventListener("DOMContentLoaded", () => {
+      // 사용자 이름 설정 UI
+      if (!username) {
+        document.getElementById("username-setup").style.display = "block";
+      } else {
+        document.getElementById("username-setup").style.display = "none";
+      }
+    
+      // 서브탭 버튼 생성
+      const targetScores = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000];
+      for (let i = 6; i < 16; i++) {
+        const btn = document.createElement("button");
+        const labelIndex = i - 6;
+        btn.textContent = `${targetScores[labelIndex]}점`;
+        btn.onclick = () => {
+          currentSubIndex = i;
+          document.querySelectorAll(".sub-tabs button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderRanking();
+        };
+        if (i === 6) btn.classList.add("active");
+        document.getElementById("count-subtabs").appendChild(btn);
+      }
+    
+      // 로컬 점수 불러오기
+      const saved = JSON.parse(localStorage.getItem("scores") || "[]");
+      if (saved.length > 0) {
+        users = saved;
+        if (username) {
+          const my = users.find(u => u.name === username);
+          if (my && Array.isArray(my.gpio)) {
+            gpio = [...my.gpio];
+          }
+        }
+      }
+    
+      renderRanking();
+      loadScoresFromServer();
     });
-}
-
-
-
-function sendScoreToServer() {
-  if (!username) return;
-
-  fetch("https://your-server.com/submit-score", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: username, gpio })
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("서버로 점수 전송 완료:", data);
-  })
-  .catch(err => {
-    console.error("점수 전송 실패:", err);
-  });
-}
-
-
-window.addEventListener("DOMContentLoaded", () => {
-  loadScoresFromServer(); // 페이지 열릴 때 서버에서 점수 받아오기
-});
-
-</script>
+    </script>
 </body>
 </html>
