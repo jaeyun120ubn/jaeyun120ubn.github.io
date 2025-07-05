@@ -57,6 +57,15 @@ let gpio = Array(16).fill(0);
 const saved = JSON.parse(localStorage.getItem("scores")|| "[]");
 if (saved.length > 0) {
   users = saved;
+
+  if (username) {
+    const my = users.find(u => u.name === username);
+    if (my) {
+      gipo = [...my.gpio];
+    }
+  }
+
+  renderRanking();
 }
 
 let username = localStorage.getItem("username");
