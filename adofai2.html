@@ -842,56 +842,5 @@ canvas{
 
 
 </div> <!-- body_0 -->
-<script>
-	const canvas = document.querySelector("canvas");
-
-	let screenTouch1 = false;
-	let screenTouch2 = false;
-
-	// 터치 상태 업데이트
-	function updateTouches(e) {
-
-		let validTouches = 0;
-
-		const rect = canvas.getBoundingClientRect();
-
-		// 정사각형 게임 영역의 바닥 위치
-		const gameBottom = rect.top + rect.width;
-
-		for (const t of e.touches) {
-
-			// 게임 화면 내부만 체크
-			if (t.clientY < gameBottom) {
-				validTouches++;
-			}
-		}
-
-		screenTouch1 = validTouches >= 1;
-		screenTouch2 = validTouches >= 2;
-	}
-
-	// 이벤트 등록
-	canvas.addEventListener("touchstart", updateTouches);
-	canvas.addEventListener("touchmove", updateTouches);
-	canvas.addEventListener("touchend", updateTouches);
-
-	// 매 프레임마다 추가 입력 적용
-	function applyExtraInputs() {
-
-		// X 버튼 추가 입력
-		if (screenTouch1) {
-			pico8_buttons[5] = true;
-		}
-
-		// O 버튼 추가 입력
-		if (screenTouch2) {
-			pico8_buttons[4] = true;
-		}
-
-		requestAnimationFrame(applyExtraInputs);
-	}
-
-	applyExtraInputs();
-</script>
 </body></html>
 
