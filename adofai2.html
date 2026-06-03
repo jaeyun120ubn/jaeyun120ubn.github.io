@@ -202,7 +202,16 @@
 
 			if (y < h - r*8)
 			{
-				// no controller buttons up here; includes canvas and menu buttons at top in touch mode
+				// 화면 터치 = X
+
+				b |= 0x10;
+
+				// 화면에 손가락이 2개 이상 있으면 O도 같이
+
+				if (num >= 2)
+				{
+					b |= 0x20;
+				}
 			}
 			else
 			{
