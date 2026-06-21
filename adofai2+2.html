@@ -202,7 +202,17 @@
 
 			if (y < h - r*8)
 			{
-				// no controller buttons up here; includes canvas and menu buttons at top in touch mode
+				if (num >= 1)
+					b |= 0x10; // X
+
+				if (num >= 2)
+					b |= 0x20; // O
+
+				if (num >= 3)
+					b |= 0x4;  // ↑
+
+				if (num >= 4)
+					b |= 0x8;  // ↓
 			}
 			else
 			{
